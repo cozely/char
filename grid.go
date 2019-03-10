@@ -13,6 +13,10 @@ type Grid struct {
 	Background Color
 }
 
+func (g *Grid) Size() Coord {
+	return g.Max.Minus(g.Min)
+}
+
 func (g *Grid) Contains(pos Coord) bool {
 	return pos.X >= g.Min.X && pos.X < g.Max.X &&
 		pos.Y >= g.Min.Y && pos.Y < g.Max.Y
@@ -26,6 +30,10 @@ var screen = Grid{
 
 func Screen() Grid {
 	return screen
+}
+
+func (g *Grid) Locate(x, y int) {
+	g.Cursor = Coord{x, y}
 }
 
 func (g *Grid) Write(p []byte) (n int, err error) {

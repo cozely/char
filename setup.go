@@ -25,8 +25,8 @@ func Setup() error {
 }
 
 func Cleanup() {
-	//unix.Write(unix.Stdout, clear)
-	//unix.Write(unix.Stdout, home)
+	unix.Write(unix.Stdout, clear)
+	unix.Write(unix.Stdout, home)
 	restore(int(unix.Stdout), oldStdout)
 	restore(int(unix.Stdin), oldStdin)
 }

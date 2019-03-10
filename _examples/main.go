@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/cozely/textmode"
 	"golang.org/x/sys/unix"
 )
@@ -12,17 +14,19 @@ func main() {
 	}
 	defer textmode.Cleanup()
 
-	x, y := 2, 2
+	scr := textmode.Screen()
+	cur := textmode.Coord{X: 2, Y: 2}
+
 	var k = []byte{0}
 	for {
-		_, err = textmode.Put(x, y, []byte("Hello,"))
+		scr.Cursor = cur
+		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
+		_, err = scr.Write([]byte(s))
 		if err != nil {
 			panic(err)
 		}
-		_, err = textmode.Put(x+1, y+1, []byte("World!"))
-		if err != nil {
-			panic(err)
-		}
+		textmode.Flush()
+		//print("GLOP")
 
 		_, err := unix.Read(unix.Stdin, k)
 		if err != nil {
@@ -33,13 +37,13 @@ func main() {
 		}
 		switch k[0] {
 		case 'h':
-			x--
+			cur.X--
 		case 'j':
-			y++
+			cur.Y++
 		case 'k':
-			y--
+			cur.Y--
 		case 'l':
-			x++
+			cur.X++
 		}
 	}
 

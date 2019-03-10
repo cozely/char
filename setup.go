@@ -19,9 +19,7 @@ func Setup() error {
 		return err
 	}
 
-	unix.Write(unix.Stdout, clear)
-	unix.Write(unix.Stdout, home)
-	err = resizeBuffer()
+	err = resize()
 
 	return err
 }

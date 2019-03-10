@@ -15,7 +15,7 @@ func main() {
 	x, y := 2, 2
 	var k = []byte{0}
 	for {
-		_, err = textmode.Put(x, y, []byte("Hello,u\u0306u"))
+		_, err = textmode.Put(x, y, []byte("Hello,"))
 		if err != nil {
 			panic(err)
 		}

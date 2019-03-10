@@ -1,16 +1,21 @@
 package textmode
 
-import "golang.org/x/text/unicode/norm"
+import (
+	"errors"
 
-type Coord struct {
-	X, Y int
-}
+	"golang.org/x/text/unicode/norm"
+)
 
 type Grid struct {
 	Min, Max   Coord
 	Cursor     Coord
 	Foreground Color
 	Background Color
+}
+
+func (g *Grid) Contains(pos Coord) bool {
+	return pos.X >= g.Min.X && pos.X < g.Max.X &&
+		pos.Y >= g.Min.Y && pos.Y < g.Max.Y
 }
 
 var screen = Grid{
@@ -24,21 +29,24 @@ func Screen() Grid {
 }
 
 func (g *Grid) Write(p []byte) (n int, err error) {
-	x, y := g.Min.X+g.Cursor.X, g.Min.Y+g.Cursor.Y
+	cur := g.Min.Plus(g.Cursor)
 
 	s := norm.NFC.Bytes(p)
 	for i := 0; i < len(s); {
 		d := norm.NFC.NextBoundary(s[i:], true)
-		cel := &back[y][x]
-		cel.glyph = cel.glyph[:0]
-		cel.glyph = append(cel.glyph, s[i:i+d]...)
-		n++
-		x++
+		if g.Contains(cur) {
+			cel := &back[cur.Y][cur.X]
+			cel.glyph = cel.glyph[:0]
+			cel.glyph = append(cel.glyph, s[i:i+d]...)
+			n++
+		} else if err == nil {
+			err = errors.New("out of grid")
+		}
+		cur.X++
 		i += d
 	}
 
-	g.Cursor.X = x - g.Min.X
-	g.Cursor.Y = y - g.Min.Y
+	g.Cursor = cur.Minus(g.Min)
 
 	return n, err
 }

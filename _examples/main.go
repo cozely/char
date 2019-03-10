@@ -16,14 +16,15 @@ func main() {
 
 	scr := textmode.Screen()
 	cur := textmode.Coord{X: 2, Y: 2}
+	msg := "Ok "
 
 	var k = []byte{0}
 	for {
 		scr.Cursor = cur
-		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
+		s := fmt.Sprintf("[%02d:%02d:%s]", cur.X, cur.Y, msg)
 		_, err = scr.Write([]byte(s))
 		if err != nil {
-			panic(err)
+			msg = "Err"
 		}
 		textmode.Flush()
 		//print("GLOP")

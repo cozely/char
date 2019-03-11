@@ -7,54 +7,43 @@ import (
 )
 
 type Grid struct {
-	Min, Max   Coord
-	Cursor     Coord
-	Foreground Color
-	Background Color
+	Min, Max Position
 }
 
-func (g *Grid) Size() Coord {
+func (g *Grid) Size() Position {
 	return g.Max.Minus(g.Min)
 }
 
-func (g *Grid) Contains(pos Coord) bool {
-	return pos.X >= g.Min.X && pos.X < g.Max.X &&
-		pos.Y >= g.Min.Y && pos.Y < g.Max.Y
-}
-
-var screen = Grid{
-	Cursor:     Coord{0, 0},
-	Foreground: Color{255, 255, 255},
-	Background: Color{0, 0, 0},
-}
+var screen Grid
 
 func Screen() Grid {
 	return screen
 }
 
-func (g *Grid) Locate(x, y int) {
-	g.Cursor = Coord{x, y}
-}
+func (g Grid) Put(pos Position, st Style, text []byte) (next Position, err error) {
+	cur := g.Min.Plus(pos)
 
-func (g *Grid) Write(p []byte) (n int, err error) {
-	cur := g.Min.Plus(g.Cursor)
+	if !cur.In(g) {
+		return pos, errors.New("Put: position out of grid")
+	}
 
-	s := norm.NFC.Bytes(p)
+	s := norm.NFC.Bytes(text)
 	for i := 0; i < len(s); {
 		d := norm.NFC.NextBoundary(s[i:], true)
-		if g.Contains(cur) {
-			cel := &back[cur.Y][cur.X]
-			cel.glyph = cel.glyph[:0]
-			cel.glyph = append(cel.glyph, s[i:i+d]...)
-			n++
-		} else if err == nil {
-			err = errors.New("out of grid")
+
+		if !cur.In(g) {
+			if err == nil {
+				err = errors.New("Put: line truncated")
+			}
+			break
 		}
+
+		cel := &back[cur.Y][cur.X]
+		cel.glyph = cel.glyph[:0]
+		cel.glyph = append(cel.glyph, s[i:i+d]...)
 		cur.X++
 		i += d
 	}
 
-	g.Cursor = cur.Minus(g.Min)
-
-	return n, err
+	return cur.Minus(g.Min), err
 }

@@ -20,18 +20,18 @@ func main() {
 	grid.Min.Y += 1
 	grid.Max.X -= 1
 	grid.Max.Y -= 1
+
 	cur := textmode.Pos(1, 1)
+	style := textmode.Style{}
 
 	var k = []byte{0}
 	for {
-		grid.Cursor = cur
 		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
-		_, err = grid.Write([]byte(s))
-		scr.Cursor = textmode.Pos(0, 0)
+		_, err = grid.Put(cur, style, []byte(s))
 		if err != nil {
-			scr.Write([]byte(err.Error()))
+			scr.Put(textmode.Pos(0, 0), style, []byte(err.Error()))
 		} else {
-			scr.Write([]byte("----------------------------------------------------------------"))
+			scr.Put(textmode.Pos(0, 0), style, []byte("----------------------------------------------------------------"))
 		}
 		textmode.Flush()
 		//print("GLOP")

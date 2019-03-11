@@ -12,7 +12,7 @@ var (
 	escBg     = []byte{27, '[', '4', '8', semicolon, '2', semicolon}
 )
 
-func locate(pos Coord) []byte {
+func locate(pos Position) []byte {
 	s := fmt.Sprintf("\x1b[%d;%dH", pos.Y+1, pos.X+1)
 	return []byte(s)
 }

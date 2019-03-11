@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+type Style struct {
+	Fg    Color
+	Bg    Color
+	Attrb uint8
+}
+
 type Color struct {
 	R, G, B uint8
 }

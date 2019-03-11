@@ -1,17 +1,22 @@
 package textmode
 
-type Coord struct {
+type Position struct {
 	X, Y int
 }
 
-func Pos(x, y int) Coord {
-	return Coord{x, y}
+func Pos(x, y int) Position {
+	return Position{x, y}
 }
 
-func (p Coord) Plus(other Coord) Coord {
-	return Coord{p.X + other.X, p.Y + other.Y}
+func (p Position) Plus(other Position) Position {
+	return Position{p.X + other.X, p.Y + other.Y}
 }
 
-func (p Coord) Minus(other Coord) Coord {
-	return Coord{p.X - other.X, p.Y - other.Y}
+func (p Position) Minus(other Position) Position {
+	return Position{p.X - other.X, p.Y - other.Y}
+}
+
+func (p Position) In(g Grid) bool {
+	return p.X >= g.Min.X && p.X < g.Max.X &&
+		p.Y >= g.Min.Y && p.Y < g.Max.Y
 }

@@ -20,7 +20,7 @@ func Screen() Grid {
 	return screen
 }
 
-func (g Grid) Put(pos Position, st Style, text []byte) (next Position, err error) {
+func (g Grid) Put(pos Position, fg, bg Color, st Style, text []byte) (next Position, err error) {
 	cur := g.Min.Plus(pos)
 
 	if !cur.In(g) {

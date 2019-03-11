@@ -4,14 +4,23 @@ import (
 	"fmt"
 )
 
-type Style struct {
-	Fg    Color
-	Bg    Color
-	Attrb uint8
-}
+type Style byte
+
+const (
+	Plain       = 0
+	Bold  Style = 1 << iota
+	Italic
+	Underline
+	Reverse
+	Dim
+)
 
 type Color struct {
 	R, G, B uint8
+}
+
+func Col(red, green, blue uint8) Color {
+	return Color{red, green, blue}
 }
 
 var colors map[Color][]byte

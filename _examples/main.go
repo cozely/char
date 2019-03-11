@@ -7,6 +7,11 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+var (
+	white = char.Col(255, 255, 255)
+	black = char.Col(0, 0, 0)
+)
+
 func main() {
 	err := char.Setup()
 	if err != nil {
@@ -22,16 +27,15 @@ func main() {
 	grid.Max.Y -= 1
 
 	cur := char.Pos(1, 1)
-	style := char.Style{}
 
 	var k = []byte{0}
 	for {
 		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
-		_, err = grid.Put(cur, style, []byte(s))
+		_, err = grid.Put(cur, white, black, char.Plain, []byte(s))
 		if err != nil {
-			scr.Put(char.Pos(0, 0), style, []byte(err.Error()))
+			scr.Put(char.Pos(0, 0), white, black, char.Plain, []byte(err.Error()))
 		} else {
-			scr.Put(char.Pos(0, 0), style, []byte("----------------------------------------------------------------"))
+			scr.Put(char.Pos(0, 0), white, black, char.Plain, []byte("----------------------------------------------------------------"))
 		}
 		char.Flush()
 		//print("GLOP")

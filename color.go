@@ -9,10 +9,14 @@ type Style byte
 const (
 	Plain       = 0
 	Bold  Style = 1 << iota
+	Dim
 	Italic
 	Underline
+	Blink
+	Unused1
 	Reverse
-	Dim
+	Unused2
+	Strikeout
 )
 
 type Color struct {

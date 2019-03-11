@@ -3,37 +3,37 @@ package main
 import (
 	"fmt"
 
-	"github.com/cozely/textmode"
+	"github.com/cozely/char"
 	"golang.org/x/sys/unix"
 )
 
 func main() {
-	err := textmode.Setup()
+	err := char.Setup()
 	if err != nil {
 		panic(err)
 	}
-	defer textmode.Cleanup()
+	defer char.Cleanup()
 
-	scr := textmode.Screen()
+	scr := char.Screen()
 	grid := scr
 	grid.Min.X += 1
 	grid.Min.Y += 1
 	grid.Max.X -= 1
 	grid.Max.Y -= 1
 
-	cur := textmode.Pos(1, 1)
-	style := textmode.Style{}
+	cur := char.Pos(1, 1)
+	style := char.Style{}
 
 	var k = []byte{0}
 	for {
 		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
 		_, err = grid.Put(cur, style, []byte(s))
 		if err != nil {
-			scr.Put(textmode.Pos(0, 0), style, []byte(err.Error()))
+			scr.Put(char.Pos(0, 0), style, []byte(err.Error()))
 		} else {
-			scr.Put(textmode.Pos(0, 0), style, []byte("----------------------------------------------------------------"))
+			scr.Put(char.Pos(0, 0), style, []byte("----------------------------------------------------------------"))
 		}
-		textmode.Flush()
+		char.Flush()
 		//print("GLOP")
 
 		_, err := unix.Read(unix.Stdin, k)

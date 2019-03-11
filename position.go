@@ -1,4 +1,4 @@
-package textmode
+package char
 
 type Position struct {
 	X, Y int

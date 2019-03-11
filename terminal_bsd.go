@@ -4,7 +4,7 @@
 
 // +build darwin dragonfly freebsd netbsd openbsd
 
-package textmode
+package char
 
 import "golang.org/x/sys/unix"
 

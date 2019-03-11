@@ -1,4 +1,4 @@
-module github.com/cozely/textmode
+module github.com/cozely/char
 
 go 1.12
 

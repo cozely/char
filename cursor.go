@@ -1,4 +1,4 @@
-package textmode
+package char
 
 var cursor Position
 

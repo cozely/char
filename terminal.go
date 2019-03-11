@@ -14,7 +14,7 @@
 // 	        panic(err)
 // 	}
 // 	defer terminal.Restore(0, oldState)
-package textmode
+package char
 
 import "golang.org/x/sys/unix"
 

@@ -7,15 +7,14 @@ import (
 type Style byte
 
 const (
-	Plain       = 0
-	Bold  Style = 1 << iota
+	Plain = 0
+
+	Bold Style = 1 << iota
 	Dim
 	Italic
 	Underline
 	Blink
-	Unused1
 	Reverse
-	Unused2
 	Strikeout
 )
 

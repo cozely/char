@@ -51,7 +51,8 @@ func resize() error {
 	back = newBuffer(width, height)
 	output = make([]byte, 2*width*height)
 
-	unix.Write(unix.Stdout, clear)
+	unix.Write(unix.Stdout, escClear)
+	unix.Write(unix.Stdout, escHome)
 	screen.Min = Position{0, 0}
 	screen.Max = Position{width, height}
 

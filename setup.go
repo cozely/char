@@ -18,15 +18,17 @@ func Setup() error {
 	if err != nil {
 		return err
 	}
+	unix.Write(unix.Stdout, escSmcup)
 
 	err = resize()
+	unix.Write(unix.Stdout, cursorShape(6))
 
 	return err
 }
 
 func Cleanup() {
-	unix.Write(unix.Stdout, clear)
-	unix.Write(unix.Stdout, home)
+	unix.Write(unix.Stdout, escClear)
+	unix.Write(unix.Stdout, escRmcup)
 	restore(int(unix.Stdout), oldStdout)
 	restore(int(unix.Stdin), oldStdin)
 }

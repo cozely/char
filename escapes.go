@@ -22,5 +22,6 @@ func locate(pos Position) []byte {
 
 func cursorShape(shape int) []byte {
 	s := fmt.Sprintf("\x1b[%d q", shape)
+	// For linux console: "\x1b[?%dc"
 	return []byte(s)
 }

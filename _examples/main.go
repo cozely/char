@@ -5,6 +5,7 @@ import (
 
 	"github.com/cozely/char"
 	"golang.org/x/sys/unix"
+	"golang.org/x/text/unicode/norm"
 )
 
 var (
@@ -19,7 +20,7 @@ func main() {
 	}
 	defer char.Cleanup()
 
-	scr := char.Screen()
+	scr := char.ScreenGrid()
 	grid := scr
 	grid.Min.X += 1
 	grid.Min.Y += 1
@@ -30,7 +31,14 @@ func main() {
 
 	var k = []byte{0}
 	for {
-		s := fmt.Sprintf("[%02d:%02d]", cur.X, cur.Y)
+		s := norm.NFC.Bytes([]byte(fmt.Sprintf("[%d:é\u032a\u0361:%d]", cur.X, cur.Y)))
+
+		count := 0
+		for i := 0; i < len(s); {
+			d := norm.NFC.NextBoundary(s[i:], true)
+			count++
+			i += d
+		}
 		_, err = grid.Put(cur, white, black, char.Plain, []byte(s))
 		if err != nil {
 			scr.Put(char.Pos(0, 0), white, black, char.Plain, []byte(err.Error()))
@@ -46,6 +54,10 @@ func main() {
 		}
 		if k[0] == byte('q') || k[0] == 0x11 || k[0] == 0x03 {
 			break
+		}
+		c := cur
+		for i := 0; i < count; i++ {
+			c, _ = grid.Put(c, white, black, char.Plain, []byte(" "))
 		}
 		switch k[0] {
 		case 'h':

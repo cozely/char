@@ -1,5 +1,6 @@
 package char
 
+/*
 import (
 	"golang.org/x/sys/unix"
 )
@@ -84,3 +85,4 @@ func Flush() error {
 	}
 	return nil
 }
+*/

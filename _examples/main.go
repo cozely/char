@@ -31,7 +31,7 @@ func main() {
 
 	var k = []byte{0}
 	for {
-		s := norm.NFC.Bytes([]byte(fmt.Sprintf("[%d:é\u032a\u0361:%d]", cur.X, cur.Y)))
+		s := norm.NFC.Bytes([]byte(fmt.Sprintf("[\u0f3a  %d:é\u032a\u0361:%d \u0f3b ]", cur.X, cur.Y)))
 
 		count := 0
 		for i := 0; i < len(s); {

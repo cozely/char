@@ -21,7 +21,7 @@ func Setup() error {
 	unix.Write(unix.Stdout, escSmcup)
 
 	err = resize()
-	unix.Write(unix.Stdout, cursorShape(6))
+	//unix.Write(unix.Stdout, cursorShape(6))
 
 	return err
 }

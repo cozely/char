@@ -57,32 +57,9 @@ func resize() error {
 	return nil
 }
 
-func screenChar(pos Position) []byte {
-	n := 0
-	for i := 0; i < len(screen.characters[pos.Y]); {
-		d := norm.NFC.NextBoundary(screen.characters[pos.Y][i:], true)
-		if n == pos.X {
-			return screen.characters[pos.Y][i : i+d]
-		}
-		n++
-		i += d
-	}
-	return nil
-}
-
-func screenFg(pos Position) Color {
-	return screen.foreground[pos.X+pos.Y*screen.width]
-}
-
-func screenBg(pos Position) Color {
-	return screen.background[pos.X+pos.Y*screen.width]
-}
-
-func screenStyle(pos Position) Style {
-	return screen.style[pos.X+pos.Y*screen.width]
-}
-
 func Flush() error {
+	//TODO: check if the dirty really are different from the current screen
+	//content.
 	output = output[:0]
 	for line := 0; line < screen.height; line++ {
 		dirty := screen.dirty[line]

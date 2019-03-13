@@ -39,14 +39,13 @@ func main() {
 			count++
 			i += d
 		}
-		_, err = grid.Put(cur, white, black, char.Plain, []byte(s))
+		_, err = grid.Write(cur, white, black, char.Plain, []byte(s))
 		if err != nil {
-			scr.Put(char.Pos(0, 0), white, black, char.Plain, []byte(err.Error()))
+			scr.Write(char.Pos(0, 0), white, black, char.Plain, []byte(err.Error()))
 		} else {
-			scr.Put(char.Pos(0, 0), white, black, char.Plain, []byte("----------------------------------------------------------------"))
+			scr.Write(char.Pos(0, 0), white, black, char.Plain, []byte("----------------------------------------------------------------"))
 		}
 		char.Flush()
-		//print("GLOP")
 
 		_, err := unix.Read(unix.Stdin, k)
 		if err != nil {
@@ -57,7 +56,7 @@ func main() {
 		}
 		c := cur
 		for i := 0; i < count; i++ {
-			c, _ = grid.Put(c, white, black, char.Plain, []byte(" "))
+			c, _ = grid.Write(c, white, black, char.Plain, []byte(" "))
 		}
 		switch k[0] {
 		case 'h':

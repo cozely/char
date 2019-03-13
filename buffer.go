@@ -1,86 +1,85 @@
 package char
 
 import (
+	"bytes"
+
 	"golang.org/x/sys/unix"
-	"golang.org/x/text/unicode/norm"
 )
 
-var screen struct {
-	width, height int
-	characters    [][]byte
-	foreground    []Color
-	background    []Color
-	style         []Style
-	dirty         []struct {
-		col      int // first dirty character
-		min, max int // dirty span in bytes
-	}
+type buffer struct {
+	characters [][]byte
+	foreground []Color
+	background []Color
+	style      []Style
 }
 
-var output []byte
+var (
+	width, height int
+	front, back   buffer
+	output        []byte
+)
+
+func newBuffer() buffer {
+	b := buffer{
+		characters: make([][]byte, width*height, width*height),
+		foreground: make([]Color, width*height, width*height),
+		background: make([]Color, width*height, width*height),
+		style:      make([]Style, width*height, width*height),
+	}
+
+	for i := range b.characters {
+		b.characters[i] = []byte{byte(' ')}
+		b.foreground[i] = Color{255, 255, 255}
+		b.background[i] = Color{0, 0, 0}
+		b.style[i] = Plain
+	}
+
+	return b
+}
 
 func resize() error {
 	var err error
 
-	width, height, err := getSize(unix.Stdout)
+	width, height, err = getSize(unix.Stdout)
 	if err != nil {
 		return err
 	}
 
 	output = make([]byte, width*height+16*height)
+	front = newBuffer()
+	back = newBuffer()
 
 	unix.Write(unix.Stdout, escClear)
 	unix.Write(unix.Stdout, escHome)
-	screen.width, screen.height = width, height
-	screen.characters = make([][]byte, height, height)
-	screen.foreground = make([]Color, width*height, width*height)
-	screen.background = make([]Color, width*height, width*height)
-	screen.style = make([]Style, width*height, width*height)
-	screen.dirty = make([]struct{ col, min, max int }, height, height)
-
-	for i := range screen.characters {
-		screen.characters[i] = make([]byte, width)
-		for j := range screen.characters[i] {
-			screen.characters[i][j] = byte(' ')
-		}
-	}
-	for i := range screen.foreground {
-		screen.foreground[i] = Color{255, 255, 255}
-		screen.background[i] = Color{0, 0, 0}
-		screen.style[i] = Plain
-	}
-	for i := range screen.dirty {
-		screen.dirty[i].min = 0
-		screen.dirty[i].max = 0
-	}
 
 	return nil
 }
 
 func Flush() error {
-	//TODO: check if the dirty really are different from the current screen
-	//content.
 	output = output[:0]
-	for line := 0; line < screen.height; line++ {
-		dirty := screen.dirty[line]
-		if dirty.min == dirty.max {
-			continue
+	cursor := Position{-1, -1}
+	var pos Position
+	for pos.Y = 0; pos.Y < height; pos.Y++ {
+		for pos.X = 0; pos.X < width; pos.X++ {
+			i := pos.X + pos.Y*width
+			fg := back.foreground[i] == front.foreground[i]
+			bg := back.background[i] == front.background[i]
+			style := back.style[i] != front.style[i]
+			character := !bytes.Equal(back.characters[i], front.characters[i])
+			if fg || bg || style || character {
+				if cursor != pos {
+					output = append(output, locate(pos)...)
+					cursor = pos
+				}
+				output = append(output, back.characters[i]...)
+				front.characters[i] = append(front.characters[i][:0], back.characters[i]...)
+				cursor.X++
+			}
 		}
-		var minbyte, maxbyte int
-		for i := 0; i < dirty.min; i++ {
-			d := norm.NFC.NextBoundary(screen.characters[line][minbyte:], true)
-			minbyte += d
-		}
-		maxbyte = minbyte
-		for i := dirty.min; i < dirty.max; i++ {
-			d := norm.NFC.NextBoundary(screen.characters[line][maxbyte:], true)
-			maxbyte += d
-		}
-		output = append(output, locate(Position{dirty.min, line})...)
-		output = append(output, screen.characters[line][minbyte:maxbyte]...)
 	}
+
 	if len(output) > 0 {
-		output = append(output, locate(cursor)...)
+		output = append(output, locate(screenCursor)...)
 		unix.Write(unix.Stdout, output)
 	}
 	return nil

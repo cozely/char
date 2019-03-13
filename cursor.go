@@ -1,7 +1,7 @@
 package char
 
-var cursor Position
+var screenCursor Position
 
 func Cursor(pos Position) {
-	cursor = pos
+	screenCursor = pos
 }

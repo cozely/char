@@ -9,7 +9,9 @@ import (
 )
 
 var (
-	white = char.Col(255, 255, 255)
+	white = char.Col(240, 238, 232)
+	red   = char.Col(242, 45, 22)
+	green = char.Col(103, 177, 12)
 	black = char.Col(0, 0, 0)
 )
 
@@ -31,7 +33,8 @@ func main() {
 
 	var k = []byte{0}
 	for {
-		s := norm.NFC.Bytes([]byte(fmt.Sprintf("[\u0f3a  %d:é\u032a\u0361:%d \u0f3b ]", cur.X, cur.Y)))
+		//s := norm.NFC.Bytes([]byte(fmt.Sprintf("[\u0f3a  %d:é\u032a\u0361:%d \u0f3b ]", cur.X, cur.Y)))
+		s := norm.NFC.Bytes([]byte(fmt.Sprintf("[%d:é\u032a\u0361:%d]", cur.X, cur.Y)))
 
 		count := 0
 		for i := 0; i < len(s); {
@@ -41,9 +44,9 @@ func main() {
 		}
 		_, err = grid.Write(cur, white, black, char.Plain, []byte(s))
 		if err != nil {
-			scr.Write(char.Pos(0, 0), white, black, char.Plain, []byte(err.Error()))
+			scr.Write(char.Pos(0, 0), red, black, char.Plain, []byte(err.Error()))
 		} else {
-			scr.Write(char.Pos(0, 0), white, black, char.Plain, []byte("----------------------------------------------------------------"))
+			scr.Write(char.Pos(0, 0), green, black, char.Plain, []byte("----------------------------------------------------------------"))
 		}
 		char.Flush()
 

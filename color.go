@@ -26,7 +26,7 @@ func Col(red, green, blue uint8) Color {
 	return Color{red, green, blue}
 }
 
-var colors map[Color][]byte
+var colors = make(map[Color][]byte)
 
 func (c Color) bytes() []byte {
 	b, ok := colors[c]

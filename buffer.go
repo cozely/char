@@ -58,12 +58,17 @@ func resize() error {
 func Flush() error {
 	output = output[:0]
 	cursor := Position{-1, -1}
+	var current struct {
+		foreground *Color
+		background *Color
+		style      *Style
+	}
 	var pos Position
 	for pos.Y = 0; pos.Y < height; pos.Y++ {
 		for pos.X = 0; pos.X < width; pos.X++ {
 			i := pos.X + pos.Y*width
-			fg := back.foreground[i] == front.foreground[i]
-			bg := back.background[i] == front.background[i]
+			fg := back.foreground[i] != front.foreground[i]
+			bg := back.background[i] != front.background[i]
 			style := back.style[i] != front.style[i]
 			character := !bytes.Equal(back.characters[i], front.characters[i])
 			if fg || bg || style || character {
@@ -71,8 +76,17 @@ func Flush() error {
 					output = append(output, locate(pos)...)
 					cursor = pos
 				}
+				if current.foreground == nil || *current.foreground != back.foreground[i] {
+					output = append(output, escFg...)
+					output = append(output, back.foreground[i].bytes()...)
+					current.foreground = &Color{}
+					*current.foreground = back.foreground[i]
+				}
 				output = append(output, back.characters[i]...)
 				front.characters[i] = append(front.characters[i][:0], back.characters[i]...)
+				front.foreground[i] = back.foreground[i]
+				front.background[i] = back.background[i]
+				front.style[i] = back.style[i]
 				cursor.X++
 			}
 		}
